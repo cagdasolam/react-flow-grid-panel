@@ -1,0 +1,456 @@
+/* React Flow Grid System Styles */
+
+.react-flow-grid-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+}
+
+/* React Flow wrapper */
+.react-flow-grid-container > div {
+  width: 100%;
+  height: 100%;
+}
+
+/**
+ * Custom Image Node Styles
+ * Displays nodes as floating images without default React Flow styling
+ */
+.custom-image-node {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.2s ease-in-out;
+}
+
+.custom-image-node:active {
+  cursor: grabbing;
+}
+
+.image-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  overflow: visible;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+  background: white;
+}
+
+/**
+ * Root/Master Node Styling
+ * Typically larger and more prominent
+ */
+.image-container.root-node {
+  width: 120px;
+  height: 120px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  border: 3px solid #2563eb;
+}
+
+/**
+ * Child Node Styling
+ * Smaller nodes for hierarchy visualization
+ */
+.image-container.child-node {
+  width: 100px;
+  height: 100px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid #60a5fa;
+}
+
+/* Node image styling */
+.node-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+/* Node label styling */
+.node-label {
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  white-space: nowrap;
+  opacity: 1;
+  transition: opacity 0.2s ease-in-out;
+  pointer-events: none;
+  font-weight: 500;
+}
+
+/**
+ * React Flow Background Grid
+ * Provides visual reference for grid snapping
+ */
+.react-flow__background {
+  background-color: #f8f9fa !important;
+}
+
+/**
+ * React Flow Controls
+ * Positioning and styling of zoom/pan controls
+ */
+.react-flow__controls {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 10;
+}
+
+.react-flow__controls-button {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 8px;
+  margin: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.react-flow__controls-button:hover {
+  background: #f3f4f6;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.react-flow__controls-button:active {
+  background: #e5e7eb;
+}
+
+/**
+ * Debug Panel
+ * Shows node information and grid settings
+ */
+.debug-panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  max-width: 320px;
+  max-height: 60vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  z-index: 5;
+}
+
+.debug-panel h3 {
+  margin: 0 0 12px 0;
+  padding: 0;
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.debug-panel h4 {
+  margin: 12px 0 8px 0;
+  padding: 0;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.debug-panel p {
+  margin: 4px 0;
+  padding: 0;
+  color: #6b7280;
+}
+
+.node-info {
+  background: #f9fafb;
+  border-left: 3px solid #3b82f6;
+  padding: 8px;
+  margin: 8px 0;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.node-info:hover {
+  background: #f3f4f6;
+  border-left-color: #2563eb;
+  cursor: pointer;
+}
+
+.node-info.selected {
+  background: #dbeafe;
+  border-left: 3px solid #2563eb;
+  font-weight: 500;
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.2);
+}
+
+/**
+ * Debug Panel Controls
+ * Buttons for adding/removing nodes
+ */
+.debug-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0;
+  padding: 12px 0;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.rename-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 11px;
+  box-sizing: border-box;
+  background: #fafafa;
+  color: #374151;
+  transition: border-color 0.2s ease;
+}
+
+.rename-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: white;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.rename-input::placeholder {
+  color: #9ca3af;
+}
+
+.debug-panel .btn {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background: white;
+  color: #374151;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.debug-panel .btn:hover:not(:disabled) {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.debug-panel .btn:active:not(:disabled) {
+  background: #e5e7eb;
+}
+
+.debug-panel .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.debug-panel .btn-add {
+  background: #ecfdf5;
+  border-color: #6ee7b7;
+  color: #047857;
+}
+
+.debug-panel .btn-add:hover {
+  background: #d1fae5;
+  border-color: #34d399;
+}
+
+.debug-panel .btn-remove {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+.debug-panel .btn-remove:hover:not(:disabled) {
+  background: #fee2e2;
+  border-color: #f87171;
+}
+
+.debug-panel .btn-clear {
+  background: #fef3c7;
+  border-color: #fcd34d;
+  color: #92400e;
+}
+
+.debug-panel .btn-clear:hover {
+  background: #fde68a;
+  border-color: #fbbf24;
+}
+
+.node-info strong {
+  color: #1f2937;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.available-node {
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 6px;
+  transition: all 0.2s ease;
+}
+
+.available-node:hover {
+  background: #fde68a;
+  border-color: #fbbf24;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.available-node strong {
+  color: #92400e;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.available-node p {
+  margin: 0;
+  color: #78350f;
+  font-size: 11px;
+}
+
+.nodes-info {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Scrollbar styling for debug panel */
+.debug-panel::-webkit-scrollbar,
+.nodes-info::-webkit-scrollbar {
+  width: 6px;
+}
+
+.debug-panel::-webkit-scrollbar-track,
+.nodes-info::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 3px;
+}
+
+.debug-panel::-webkit-scrollbar-thumb,
+.nodes-info::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.debug-panel::-webkit-scrollbar-thumb:hover,
+.nodes-info::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/**
+ * React Flow Edge Styling
+ * Customization for connection lines
+ */
+.react-flow__edge {
+  stroke: #60a5fa;
+  stroke-width: 2px;
+}
+
+.react-flow__edge.selected {
+  stroke: #2563eb;
+  stroke-width: 3px;
+}
+
+.react-flow__edge-path {
+  stroke: inherit;
+  stroke-width: inherit;
+}
+
+/**
+ * Responsive Design
+ * Adjusts layout for smaller screens
+ */
+@media (max-width: 768px) {
+  .debug-panel {
+    max-width: 280px;
+    font-size: 11px;
+    padding: 12px;
+  }
+
+  .debug-panel h3 {
+    font-size: 12px;
+  }
+
+  .debug-panel h4 {
+    font-size: 11px;
+  }
+
+  .image-container.root-node {
+    width: 100px;
+    height: 100px;
+  }
+
+  .image-container.child-node {
+    width: 80px;
+    height: 80px;
+  }
+
+  .node-label {
+    font-size: 10px;
+  }
+
+  .react-flow__controls {
+    bottom: 10px;
+    left: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .debug-panel {
+    display: none;
+  }
+
+  .image-container.root-node {
+    width: 80px;
+    height: 80px;
+  }
+
+  .image-container.child-node {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/**
+ * Animation for node selection
+ */
+@keyframes nodeSelected {
+  0% {
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+  100% {
+    box-shadow: 0 0 0 0px rgba(37, 99, 235, 0);
+  }
+}
+
+.react-flow__node.selected .image-container {
+  animation: nodeSelected 0.5s ease-in-out;
+}
+
+/**
+ * Dragging state
+ */
+.react-flow__node.dragging .image-container {
+  opacity: 0.8;
+}

@@ -1,0 +1,16 @@
+/* index.css - minimal global reset */
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  background-color: #fff;
+  color: #000;
+}
+
+/* additional global styles can be added as needed */
