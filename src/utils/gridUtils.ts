@@ -66,14 +66,18 @@ export const calculateWorldCoordinates = (
 };
 
 /**
- * Calculates the snapped position for a node being dragged
- * Uses both grid snapping and relative coordinate calculation
- * @param newX - New world X position
- * @param newY - New world Y position
- * @param referenceX - Reference node world position X
- * @param referenceY - Reference node world position Y
+ * Calculates the snapped position for a node being dragged.
+ * Since CSS `transform: translate(-50%, -50%)` is applied to nodes,
+ * node.position IS the visual center point. We simply snap it to the
+ * nearest grid point and calculate relative coordinates as direct
+ * position-to-position differences.
+ *
+ * @param newX - New position X (center point due to CSS transform)
+ * @param newY - New position Y (center point due to CSS transform)
+ * @param referenceX - Reference node position X (center point)
+ * @param referenceY - Reference node position Y (center point)
  * @param gridSize - The size of the grid unit (default: GRID_SIZE)
- * @returns Object with snapped world coordinates and relative grid coordinates
+ * @returns Object with snapped position and relative grid coordinates
  */
 export const calculateSnappedPosition = (
   newX: number,
@@ -82,11 +86,11 @@ export const calculateSnappedPosition = (
   referenceY: number,
   gridSize: number = GRID_SIZE,
 ) => {
-  // Snap to grid first
+  // Snap position (which IS the center) to the nearest grid point
   const snappedX = snapToGrid(newX, gridSize);
   const snappedY = snapToGrid(newY, gridSize);
 
-  // Calculate relative coordinates
+  // Calculate relative coordinates (position-to-position, both are centers)
   const { rX, rY } = calculateRelativeCoordinates(
     snappedX,
     snappedY,

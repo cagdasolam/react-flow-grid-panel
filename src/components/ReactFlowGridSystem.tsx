@@ -1,28 +1,47 @@
 import React, { useCallback, useMemo, useState } from "react";
-import ReactFlow, {
+import {
+  ReactFlow,
   Controls,
   Background,
   useNodesState,
   useEdgesState,
   addEdge,
-} from "reactflow";
-import type { Node, Edge, NodeTypes, Connection } from "reactflow";
-import "reactflow/dist/style.css";
+} from "@xyflow/react";
+import type { Node, Edge, NodeTypes, Connection } from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
 
 import CustomImageNode from "../components/CustomImageNode";
 import type { CustomNodeData } from "../components/CustomImageNode";
 import { GRID_SIZE, calculateSnappedPosition } from "../utils/gridUtils";
 
 /**
+ * Props for available nodes from prompt
+ */
+interface AvailableNodeInput {
+  imageUrl: string;
+  label: string;
+  isRoot: boolean;
+}
+
+/**
+ * Props for ReactFlowGridSystem
+ */
+interface ReactFlowGridSystemProps {
+  availableNodes: AvailableNodeInput[];
+}
+
+/**
  * ReactFlowGridSystem Component
  * Main component that implements a grid-based node positioning system
  * with relative coordinates to a root/master node.
  */
-const ReactFlowGridSystem: React.FC = () => {
+const ReactFlowGridSystem: React.FC<ReactFlowGridSystemProps> = ({
+  availableNodes: nodeInputs,
+}) => {
   // Define custom node types
   const nodeTypes: NodeTypes = useMemo(
     () => ({
-      customImage: CustomImageNode,
+      customImage: CustomImageNode as any,
     }),
     [],
   );
@@ -30,83 +49,42 @@ const ReactFlowGridSystem: React.FC = () => {
   /**
    * Available nodes that can be added from debug panel
    * All child nodes have relative coordinates to the root node
+   * Constructed from prompt inputs
    */
-  const availableNodes: Node<CustomNodeData>[] = [
-    {
-      id: "node-1",
+  const availableNodes: Node<CustomNodeData>[] = useMemo(() => {
+    return nodeInputs.map((input, index) => ({
+      id: `node-${index + 1}`,
       data: {
-        label: "Child Node 1",
-        imageUrl: "",
+        label: input.label,
+        imageUrl: input.imageUrl,
         relativeTo: "root",
-        gridCoords: { rX: 5, rY: 0 },
-        isRoot: false,
-        width: 100,
-        height: 100,
+        gridCoords: { rX: (index + 1) * 5, rY: 0 },
+        isRoot: input.isRoot,
+        width: 59,
+        height: 59,
       },
-      position: { x: 500, y: 200 },
+      position: { x: 400 + (index + 1) * 120, y: 200 },
       type: "customImage",
       draggable: true,
-    },
-    {
-      id: "node-2",
-      data: {
-        label: "Child Node 2",
-        imageUrl: "",
-        relativeTo: "root",
-        gridCoords: { rX: -5, rY: 0 },
-        isRoot: false,
-        width: 110,
-        height: 110,
-      },
-      position: { x: 300, y: 200 },
-      type: "customImage",
-      draggable: true,
-    },
-    {
-      id: "node-3",
-      data: {
-        label: "Child Node 3",
-        imageUrl: "",
-        relativeTo: "root",
-        gridCoords: { rX: 0, rY: 5 },
-        isRoot: false,
-        width: 90,
-        height: 90,
-      },
-      position: { x: 400, y: 300 },
-      type: "customImage",
-      draggable: true,
-    },
-    {
-      id: "node-4",
-      data: {
-        label: "Child Node 4",
-        imageUrl: "",
-        relativeTo: "root",
-        gridCoords: { rX: 5, rY: -5 },
-        isRoot: false,
-        width: 100,
-        height: 100,
-      },
-      position: { x: 500, y: 100 },
-      type: "customImage",
-      draggable: true,
-    },
-  ];
+    }));
+  }, [nodeInputs]);
 
   /**
    * Root node configuration
+   * CSS transform: translate(-50%, -50%) makes position the visual center.
+   * Position is set directly to a grid-aligned point.
    */
   const rootNode: Node<CustomNodeData> = {
     id: "root",
     data: {
       label: "Master Node",
-      imageUrl: "",
+      imageUrl:
+        "https://kolayik-files.s3.eu-central-1.amazonaws.com/production/7103c5454f0c18e425477449802c5d12/avatar/516c5db56506e863de467e04809b194e_2025-02-1809%3A51%3A57-me.jpeg",
       relativeTo: "root",
       gridCoords: { rX: 0, rY: 0 },
       isRoot: true,
-      width: 120,
-      height: 60,
+      width: 140,
+      height: 140,
     },
     position: { x: 400, y: 200 },
     type: "customImage",
@@ -139,7 +117,7 @@ const ReactFlowGridSystem: React.FC = () => {
         );
         if (!rootNode) return prevNodes;
 
-        // If root node is being dragged, update it and recalculate all child relative coordinates
+
         if (draggedNode.id === "root") {
           const snappedData = calculateSnappedPosition(
             draggedNode.position.x,
@@ -151,7 +129,6 @@ const ReactFlowGridSystem: React.FC = () => {
 
           return prevNodes.map((node: Node<CustomNodeData>) => {
             if (node.data?.isRoot) {
-              // Update root node position
               return {
                 ...node,
                 position: {
@@ -160,16 +137,12 @@ const ReactFlowGridSystem: React.FC = () => {
                 },
                 data: {
                   ...node.data,
-                  gridCoords: {
-                    rX: 0,
-                    rY: 0,
-                  },
+                  gridCoords: { rX: 0, rY: 0 },
                 },
               };
             }
 
-            // Child nodes stay in place but their relative coordinates are updated
-            // Calculate new relative coordinates based on the new master position
+            // Child nodes stay in place, recalculate relative coords
             const relativeX = Math.round(
               (node.position.x - snappedData.worldX) / GRID_SIZE,
             );
@@ -179,19 +152,15 @@ const ReactFlowGridSystem: React.FC = () => {
 
             return {
               ...node,
-              // Position stays the same!
               data: {
                 ...node.data,
-                gridCoords: {
-                  rX: relativeX,
-                  rY: relativeY,
-                },
+                gridCoords: { rX: relativeX, rY: relativeY },
               },
             };
           });
         }
 
-        // If a child node is being dragged, update its position and relative coordinates
+        // Child node drag
         const snappedData = calculateSnappedPosition(
           draggedNode.position.x,
           draggedNode.position.y,
@@ -217,7 +186,6 @@ const ReactFlowGridSystem: React.FC = () => {
               },
             };
           }
-
           return node;
         });
       });
@@ -225,20 +193,7 @@ const ReactFlowGridSystem: React.FC = () => {
     [setNodes],
   );
 
-  /**
-   * Handles new connection attempts
-   * Currently only allows connections to the root node
-   */
-  const onConnect = useCallback(
-    (connection: Connection) => {
-      // Optionally restrict connections - uncomment to enforce root-only connections
-      // if (connection.source !== 'root' && connection.target !== 'root') {
-      //   return;
-      // }
-      setEdges((eds: Edge[]) => addEdge(connection, eds));
-    },
-    [setEdges],
-  );
+
 
   /**
    * Add a node from availableNodes
@@ -254,7 +209,8 @@ const ReactFlowGridSystem: React.FC = () => {
         return;
       }
 
-      // Calculate world position based on relative coordinates
+      // Since position IS the center (CSS translate handles visual centering),
+      // child position = root position + relative * GRID_SIZE
       const worldX =
         root.position.x + (templateNode.data?.gridCoords.rX ?? 0) * GRID_SIZE;
       const worldY =
@@ -266,14 +222,6 @@ const ReactFlowGridSystem: React.FC = () => {
       };
 
       setNodes((ns) => [...ns, newNode]);
-      setEdges((eds) => [
-        ...eds,
-        {
-          id: `e-root-${templateNode.id}`,
-          source: "root",
-          target: templateNode.id,
-        },
-      ]);
       setSelectedNodeId(templateNode.id);
     },
     [nodes, setNodes, setEdges],
@@ -289,11 +237,6 @@ const ReactFlowGridSystem: React.FC = () => {
     }
 
     setNodes((ns) => ns.filter((n) => n.id !== selectedNodeId));
-    setEdges((eds) =>
-      eds.filter(
-        (e) => e.source !== selectedNodeId && e.target !== selectedNodeId,
-      ),
-    );
     setSelectedNodeId(null);
   }, [selectedNodeId, setNodes, setEdges]);
 
@@ -305,7 +248,7 @@ const ReactFlowGridSystem: React.FC = () => {
       window.confirm("Are you sure? This will remove all nodes except root.")
     ) {
       setNodes((ns) => ns.filter((n) => n.data?.isRoot));
-      setEdges([]);
+
       setSelectedNodeId(null);
     }
   }, [setNodes, setEdges]);
@@ -321,11 +264,11 @@ const ReactFlowGridSystem: React.FC = () => {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
         onNodeDragStop={onNodeDragStop}
         nodeTypes={nodeTypes}
-        snapToGrid={true}
-        snapGrid={[GRID_SIZE, GRID_SIZE]}
+        nodeOrigin={[0.5, 0.5]}
+        // snapToGrid={true}
+        // snapGrid={[GRID_SIZE, GRID_SIZE]}
         fitView
       >
         {/* Visual grid background */}
@@ -371,27 +314,30 @@ const ReactFlowGridSystem: React.FC = () => {
         </div>
 
         {/* Node Management Buttons */}
-        <div className="debug-controls" style={{ marginTop: "12px" }}>
-          <button
-            onClick={removeSelectedNode}
-            className="btn btn-remove"
-            disabled={!selectedNodeId || selectedNodeId === "root"}
-          >
-            ➖ Remove Selected
-          </button>
-          <button onClick={clearAllNodes} className="btn btn-clear">
-            🗑️ Clear All
-          </button>
-        </div>
 
         <div className="nodes-info">
-          <h4>Active Nodes ({nodes.length}):</h4>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <h4 style={{ margin: 0 }}>Active Nodes ({nodes.length}):</h4>
+            <button
+              onClick={clearAllNodes}
+              className="btn btn-clear"
+              style={{ padding: "6px 12px" }}
+            >
+              🗑️ Clear All
+            </button>
+          </div>
           {nodes.map((node: Node<CustomNodeData>) => (
             <div
               key={node.id}
               className={`node-info ${selectedNodeId === node.id ? "selected" : ""}`}
               onClick={() => setSelectedNodeId(node.id)}
-              style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer", position: "relative" }}
             >
               <strong>{node.data?.label || node.id}</strong>
               <p>
@@ -415,6 +361,36 @@ const ReactFlowGridSystem: React.FC = () => {
                 >
                   ✓ Selected
                 </p>
+              )}
+              {node.id !== "root" && selectedNodeId === node.id && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeSelectedNode();
+
+                  }}
+                  style={{
+                    position: "absolute",
+                    top: "6px",
+                    right: "6px",
+                    background: "#ff4444",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "50%",
+                    width: "24px",
+                    height: "24px",
+                    cursor: "pointer",
+                    fontSize: "16px",
+                    padding: "0",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: "bold",
+                  }}
+                  title="Delete node"
+                >
+                  ✕
+                </button>
               )}
             </div>
           ))}

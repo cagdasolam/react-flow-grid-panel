@@ -3,7 +3,7 @@
  * Comprehensive type definitions for all components and utilities
  */
 
-import type { Node, Edge } from "reactflow";
+import type { Node, Edge } from "@xyflow/react";
 
 /**
  * Grid coordinate system for relative positioning
@@ -24,7 +24,7 @@ export interface WorldCoordinates {
 /**
  * Custom node data structure for image-based nodes
  */
-export interface CustomNodeData {
+export interface CustomNodeData extends Record<string, unknown> {
   /** URL of the image to display */
   imageUrl: string;
 
